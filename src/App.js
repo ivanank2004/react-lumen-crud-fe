@@ -6,14 +6,13 @@ import Notes from './pages/Notes';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
-  const [view, setView] = useState('login'); // login | register | notes
+  const [view, setView] = useState('login');
 
-  // cek token saat App di-load
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
     if (savedToken) {
       setToken(savedToken);
-      setView('notes'); // langsung ke Notes
+      setView('notes');
     }
   }, []);
 
