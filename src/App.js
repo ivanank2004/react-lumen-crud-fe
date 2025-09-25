@@ -1,4 +1,3 @@
-// src/App.js
 import { useState, useEffect } from 'react';
 import api from './services/api';
 import Login from './pages/Login';
@@ -9,14 +8,18 @@ export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [view, setView] = useState('login'); // login | register | notes
 
-  // Jika token sudah ada di localStorage, langsung tampilkan Notes
+  // cek token saat App di-load
   useEffect(() => {
-    if (token) setView('notes');
-  }, [token]);
+    const savedToken = localStorage.getItem('token');
+    if (savedToken) {
+      setToken(savedToken);
+      setView('notes'); // langsung ke Notes
+    }
+  }, []);
 
   const handleLogout = async () => {
     try {
-      await api.post('/logout');         // panggil API logout
+      await api.post('/logout');
     } catch (e) {
       console.error(e);
     }
@@ -29,7 +32,7 @@ export default function App() {
     <div style={{ padding: 20 }}>
       <h1>React + Lumen Notes</h1>
 
-      {view === 'login' && (
+      {view === 'login' && !token && (
         <>
           <Login
             onSuccess={(newToken) => {
@@ -45,7 +48,7 @@ export default function App() {
         </>
       )}
 
-      {view === 'register' && (
+      {view === 'register' && !token && (
         <>
           <Register onSuccess={() => setView('login')} />
           <p>

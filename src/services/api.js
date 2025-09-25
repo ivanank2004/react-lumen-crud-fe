@@ -1,13 +1,12 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // ganti sesuai URL backend Anda
+  baseURL: 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// kalau sudah login simpan token di localStorage
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
