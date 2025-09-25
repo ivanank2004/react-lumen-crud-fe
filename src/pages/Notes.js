@@ -5,75 +5,73 @@ import EditNote from './EditNote';
 export default function Notes() {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState({ title: '', content: '' });
-  const [editing, setEditing] = useState(null); // note yang sedang di-edit
+  const [editing, setEditing] = useState(null);
 
   const fetchNotes = async () => {
-    const { data } = await api.get('/notes');
-    setNotes(data);
+    try {
+      const { data } = await api.get('/notes');
+      setNotes(data);
+    } catch (err) {
+      console.error(err);
+      alert('Gagal memuat catatan');
+    }
   };
 
   useEffect(() => { fetchNotes(); }, []);
 
   const createNote = async (e) => {
     e.preventDefault();
-    await api.post('/notes', newNote);
-    setNewNote({ title: '', content: '' });
-    fetchNotes();
+    try {
+      await api.post('/notes', newNote);
+      setNewNote({ title: '', content: '' });
+      fetchNotes();
+    } catch (err) {
+      console.error(err);
+      alert('Gagal menambah catatan');
+    }
   };
 
   const deleteNote = async (id) => {
-    await api.delete(`/notes/${id}`);
-    fetchNotes();
+    if (!window.confirm('Hapus catatan ini?')) return;
+    try {
+      await api.delete(`/notes/${id}`);
+      fetchNotes();
+    } catch (err) {
+      console.error(err);
+      alert('Gagal menghapus catatan');
+    }
   };
 
-  return (
-    <div style={{ maxWidth: 600, margin: '0 auto' }}>
-      <h2>Daftar Catatan</h2>
+  const container = { maxWidth: 600, margin: '0 auto', fontFamily: 'Arial, sans-serif' };
+  const input = { width: '100%', padding: 10, marginBottom: 10, borderRadius: 6, border: '1px solid #ccc', fontSize: 16 };
+  const textarea = { ...input, resize: 'vertical', minHeight: 80 };
+  const button = { padding: '8px 16px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 14 };
+  const addButton = { ...button, background: '#4CAF50', color: '#fff' };
+  const updateButton = { ...button, background: '#FFC107', color: '#000' };
+  const deleteButton = { ...button, background: '#f44336', color: '#fff' };
+  const card = { border: '1px solid #ddd', padding: 16, borderRadius: 8, marginBottom: 12, background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' };
 
-      {/* Form tambah catatan */}
-      <form onSubmit={createNote} style={{ marginBottom: 20 }}>
-        <input
-          style={{ width: '100%', marginBottom: 8, padding: 6 }}
-          value={newNote.title}
-          onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
-          placeholder="Judul catatan"
-          required
-        />
-        <textarea
-          style={{ width: '100%', marginBottom: 8, padding: 6 }}
-          value={newNote.content}
-          onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-          placeholder="Isi catatan"
-          rows={4}
-          required
-        />
-        <button type="submit" style={{ padding: '6px 12px' }}>Tambah</button>
+  return (
+    <div style={container}>
+      <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Daftar Catatan</h2>
+
+      <form onSubmit={createNote} style={{ marginBottom: 30 }}>
+        <input style={input} value={newNote.title} onChange={(e) => setNewNote({ ...newNote, title: e.target.value })} placeholder="Judul catatan" required />
+        <textarea style={textarea} value={newNote.content} onChange={(e) => setNewNote({ ...newNote, content: e.target.value })} placeholder="Isi catatan" required />
+        <button type="submit" style={addButton}>Tambah Catatan</button>
       </form>
 
-      {/* Daftar catatan */}
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {notes.map((n) => (
-          <li
-            key={n.id}
-            style={{
-              border: '1px solid #ccc',
-              padding: 10,
-              marginBottom: 10,
-              borderRadius: 6,
-              background: '#fafafa',
-            }}
-          >
-            <strong>{n.title}</strong>
-            <p style={{ whiteSpace: 'pre-line' }}>{n.content}</p>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setEditing(n)}>Update</button>
-              <button onClick={() => deleteNote(n.id)}>Delete</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {notes.map((n) => (
+        <div key={n.id} style={card}>
+          <h3 style={{ margin: '0 0 8px 0' }}>{n.title}</h3>
+          <p style={{ whiteSpace: 'pre-line', margin: '0 0 12px 0' }}>{n.content}</p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button style={updateButton} onClick={() => setEditing(n)}>Update</button>
+            <button style={deleteButton} onClick={() => deleteNote(n.id)}>Delete</button>
+          </div>
+        </div>
+      ))}
 
-      {/* Form edit muncul jika editing != null */}
       {editing && (
         <EditNote
           note={editing}

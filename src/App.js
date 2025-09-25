@@ -28,9 +28,21 @@ export default function App() {
     setView('login');
   };
 
+  const container = { maxWidth: 600, margin: '0 auto', padding: 20, fontFamily: 'Arial, sans-serif' };
+  const logoutBtn = {
+    padding: '8px 16px',
+    borderRadius: 6,
+    border: 'none',
+    cursor: 'pointer',
+    background: '#f44336',
+    color: '#fff',
+    marginBottom: 20,
+    transition: 'all 0.2s',
+  };
+
   return (
-    <div style={{ padding: 20 }}>
-      <h1>React + Lumen Notes</h1>
+    <div style={container}>
+      <h1 style={{ textAlign: 'center', marginBottom: 30 }}>React + Lumen Notes</h1>
 
       {view === 'login' && !token && (
         <>
@@ -41,9 +53,14 @@ export default function App() {
               setView('notes');
             }}
           />
-          <p>
+          <p style={{ textAlign: 'center', marginTop: 10 }}>
             Belum punya akun?{' '}
-            <button onClick={() => setView('register')}>Register</button>
+            <button
+              style={{ ...logoutBtn, background: '#4CAF50' }}
+              onClick={() => setView('register')}
+            >
+              Register
+            </button>
           </p>
         </>
       )}
@@ -51,16 +68,28 @@ export default function App() {
       {view === 'register' && !token && (
         <>
           <Register onSuccess={() => setView('login')} />
-          <p>
+          <p style={{ textAlign: 'center', marginTop: 10 }}>
             Sudah punya akun?{' '}
-            <button onClick={() => setView('login')}>Login</button>
+            <button
+              style={{ ...logoutBtn, background: '#2196F3' }}
+              onClick={() => setView('login')}
+            >
+              Login
+            </button>
           </p>
         </>
       )}
 
       {view === 'notes' && token && (
         <>
-          <button onClick={handleLogout}>Logout</button>
+          <button
+            style={logoutBtn}
+            onClick={handleLogout}
+            onMouseEnter={e => e.currentTarget.style.opacity = 0.8}
+            onMouseLeave={e => e.currentTarget.style.opacity = 1}
+          >
+            Logout
+          </button>
           <Notes />
         </>
       )}
